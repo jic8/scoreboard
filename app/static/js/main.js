@@ -60,6 +60,7 @@ mqttClient.on("message", (topic, message) => {
         case "washing-time-left":
             if(message === '*'){
                 setRobotTime(robotElement.querySelector('.time'), 'Мойка окончена')
+                break;
             }
             if(message < 1){
                 setRobotTime(robotElement.querySelector('.time'), 'Менее минуты')
