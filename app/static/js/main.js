@@ -65,8 +65,7 @@ mqttClient.on("message", (topic, message) => {
                 setRobotTime(robotElement.querySelector('.time'), 'Менее минуты')
                 
             } else {
-                // TODO: падежи
-                setRobotTime(robotElement.querySelector('.time'), `${message} мин.`)
+                setRobotTime(robotElement.querySelector('.time'), `${formatMinutes(message)}`)
             }
             break;
         case 'state':
@@ -101,6 +100,7 @@ setInterval(() => {
         if(robot.querySelector(".state").innerHTML !== 'Свободен'){
             let hideElement = robot.querySelector('.hide');
             let robotOption = hideElement.classList[0];
+
             switch (robotOption) {
                 case 'state':
                     robot.querySelector('.time').classList.add("hide")
@@ -115,3 +115,19 @@ setInterval(() => {
         }
     });
 }, 3000)
+
+
+let formatMinutes = (minutes) => {
+    let number = minutes % 100;
+    let lastDigit = number % 10;
+  
+    if (number >= 11 && number <= 19) {
+      return minutes + ' минут';
+    } else if (lastDigit === 1) {
+      return minutes + ' минута';
+    } else if (lastDigit >= 2 && lastDigit <= 4) {
+      return minutes + ' минуты';
+    } else {
+      return minutes + ' минут';
+    }
+}
