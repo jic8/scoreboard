@@ -7,10 +7,11 @@
 	<title>Eel Example</title>
 	<style>
 	.wrapper{
-		width: 280px;
-		height: 280px;
+		padding: 10px;
+		width: 260px;
+		height: 260px;
 		font-weight: bold;
-		font-size: 19px;
+		font-size: 22px;
 		display: flex;
 		flex-direction: column;
 		justify-items: start;
@@ -25,27 +26,33 @@
 		width: 50px;
 	}
 	.arrow{
-		width: 60px;
+		margin-right: 5px;
+		text-align: center;
 	}
 	.robot{
-		display: flex;
+		display: grid;
+		grid-template-columns: 25px 25px 1fr;
 	}
 	.hide{
 		display: none;
 	}
-	/* TODO: color status */
+	.state, .time{
+		text-align: center;
+	}
 	</style>
 </head>
     <body> 
         <div class="wrapper">
 			{% for num_robot in range(1, context.count_robots + 1) %}
 				<div class="robot" data-robot="{{num_robot}}">
-					<span class="arrow">&#10550;</span><span class="robnum">{{num_robot}}</span><span class="state">Свободен</span><span class="time hide">---</span>
+					<span class="arrow {{context.arrow_direction[num_robot] }}">&#11014;</span>
+					<span class="robnum">{{num_robot}}</span>
+					<span class="state" style="color: green;">Свободен</span>
+					<span class="time hide">---</span>
 				</div>
 			{% endfor %}
 		</div>
-		{{context.brokers}}
     	<script src="./static/js/mqtt.min.js"></script>
-    	<script src="./static/js/mainClass.js?{{context.brokers}}"></script>
+    	<script src="./static/js/mainClass.js?{{context.brokers}}?{{context.slider_time}}"></script>
     </body>
 </html>

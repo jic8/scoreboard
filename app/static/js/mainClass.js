@@ -17,7 +17,7 @@ class MQTTClient {
         this.client = mqtt.connect(brokerUrl, options);
         
         this.client.on('connect', () => {
-        console.log('MQTT клиент подключен');
+        console.log('MQTT клиент подключен ', brokerUrl);
         });
         
         this.client.on('message', (topic, message) => {
@@ -38,12 +38,14 @@ const scriptTag = document.querySelector('script[src*="mainClass.js"]');
 // Получение URL из атрибута src
 const src = scriptTag.getAttribute('src');
 
-const brokerParamsString = src.split("?")[1].replace(/'/g,'"')
+const splitParams = src.split("?")
+const brokerParamsString = splitParams[1].replace(/'/g,'"')
 const brokerParams = JSON.parse(brokerParamsString)
+const timeSlider = splitParams[2]
 
 brokerParams.forEach(broker => {
 // создание класса MQTTClient
-  const client = new MQTTClient(`ws://${broker.server_url}:${broker.server_port}`);
+  const client = new MQTTClient(`ws://${broker.mqtt_host}:${broker.mqtt_port}`);
   client.subscribe('#', { qos: 0 });
 });
 
@@ -70,9 +72,10 @@ let sliderEngine = () => {
     robots.forEach(robot => {
         // check if now robot not free
         let robotStatus = robot.querySelector(".state").innerHTML
-        // let robotTime = robot.querySelector(".time").innerHTML
-
-        if(robotStatus !== 'Свободен'){
+        let robotTime = robot.querySelector(".time").innerHTML
+        
+        // TODO: fix недоступно и в работе 
+        if(robotStatus === 'Занят' && robotTime !== '---'){
             let hideElement = robot.querySelector('.hide');
             let robotOption = hideElement.classList[0];
 
@@ -88,10 +91,12 @@ let sliderEngine = () => {
                     break;
             }
         }
+
+
     });
 }
 
-const restart = restartInterval(sliderEngine, 3000); // Запустить интервал с функцией sliderEngine и задержкой 3000 миллисекунд
+const restart = restartInterval(sliderEngine, timeSlider); // Запустить интервал с функцией sliderEngine и задержкой в timeSlider миллисекунд
 
 let formatMinutes = (minutes) => {
     let number = minutes % 100;
@@ -123,26 +128,29 @@ const messageHandler = (topic, message) => {
     switch (robotOption) {
         case "washing-time-left":
             if(message === '*'){
-                robotElement.querySelector('.time').innerHTML = 'Мойка окончена'
+                robotElement.querySelector('.time').innerHTML = 'Мойка окончена';
                 break;
             }
             if(message < 1){
-                robotElement.querySelector('.time').innerHTML =  'Менее минуты'
+                robotElement.querySelector('.time').innerHTML =  'Менее минуты';
                 
             } else {
-                robotElement.querySelector('.time').innerHTML = `${formatMinutes(message)}`
+                robotElement.querySelector('.time').innerHTML = `${formatMinutes(message)}`;
             }
             break;
         case 'state':
             switch (message) {
                 case '0':
-                    robotElement.querySelector('.state').innerHTML = 'Свободен'
+                    robotElement.querySelector('.state').innerHTML = 'Свободен';
+                    robotElement.querySelector('.state').style.color = "green";
                     break;
                 case '1':
-                    robotElement.querySelector('.state').innerHTML =  'Занят'
+                    robotElement.querySelector('.state').innerHTML =  'Занят';
+                    robotElement.querySelector('.state').style.color = "orange";
                     break;
                 case '2':
-                    robotElement.querySelector('.state').innerHTML =  'Недоступен'
+                    robotElement.querySelector('.state').innerHTML =  'Недоступен';
+                    robotElement.querySelector('.state').style.color = "red";
                     break;
             }
             break;
@@ -151,3 +159,28 @@ const messageHandler = (topic, message) => {
     // reset slider after new topic
     restart()
 }
+
+// Rotate arrow
+const rotateArrow = (el, angle) => {
+    el.style.transform = `rotate(${angle}deg)`;
+}
+
+(() => {
+    const arrows = document.querySelectorAll('.arrow');
+    arrows.forEach(arrow => {
+        // get class direction
+        const direction = arrow.classList[1]
+        // set rotation
+        switch (direction) {
+            case "R":
+                rotateArrow(arrow, 90)
+                break;
+            case "L":
+                rotateArrow(arrow, -90)
+                break;
+            case "D":
+                rotateArrow(arrow, 180)
+                break;
+        }
+    });
+})()

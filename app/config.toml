@@ -1,12 +1,16 @@
 title = "Конфигурация табло со списком роботов"
 
 [[broker]]
-server_url = "192.168.1.120"
-server_port = 9001
+mqtt_host = "10.0.10.185"
+mqtt_port = 9001
 
+# local this
 [[broker]]
-server_url = "test.mosquitto.org"
-server_port = 8080
+mqtt_host = "192.168.1.120"
+mqtt_port = 9001
 
-[clients]
-count_robots = 10
+[robots]
+count = 10
+direction = ["L","R","T","D","L","L","D","L","T","L"]
+slider_time = 10
+
