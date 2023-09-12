@@ -1,8 +1,12 @@
 title = "Конфигурация табло со списком роботов"
 
-[server]
+[[broker]]
 server_url = "192.168.1.120"
 server_port = 9001
+
+[[broker]]
+server_url = "test.mosquitto.org"
+server_port = 8080
 
 [clients]
 count_robots = 10

@@ -1,18 +1,51 @@
-let mqttClient;
+class MQTTClient {
+    constructor(brokerUrl) {
+        const options = {
+            clientId: 'mr_' + Math.random().toString(16).substring(2, 8),
+            username: mqtt.username,
+            password: mqtt.password,
+            useSSL: false,
+            protocolId: 'MQTT',
+            protocolVersion: 5,
+            rejectUnauthorized: false,
+            clean: true,
+            reconnectPeriod: 20000,
+            connectTimeout: 30 * 1000,
+            protocol: 'mqtt',
+        };
 
-// our MQTT broker
-// get client url from DOM
-let url = "" //document.querySelector('[data-url]').dataset.url
-let host = `ws://${url}/`;
+        this.client = mqtt.connect(brokerUrl, options);
+        
+        this.client.on('connect', () => {
+        console.log('MQTT клиент подключен');
+        });
+        
+        this.client.on('message', (topic, message) => {
+        console.log(`Получено сообщение на топике ${topic}: ${message}`);
+        messageHandler(topic, message)
+        });
+    }
+
+    subscribe(topic) {
+        this.client.subscribe(topic);
+        console.log(`Подписка на топик ${topic}`);
+    }
+  }
 
 // Получение ссылки на скрипт
-const scriptTag = document.querySelector('script[src*="main.js"]');
+const scriptTag = document.querySelector('script[src*="mainClass.js"]');
 
 // Получение URL из атрибута src
 const src = scriptTag.getAttribute('src');
 
 const brokerParamsString = src.split("?")[1].replace(/'/g,'"')
-const brokerParams = src.split("?")[1].replace(/'/g,'"')
+const brokerParams = JSON.parse(brokerParamsString)
+
+brokerParams.forEach(broker => {
+// создание класса MQTTClient
+  const client = new MQTTClient(`ws://${broker.server_url}:${broker.server_port}`);
+  client.subscribe('#', { qos: 0 });
+});
 
 // this for reset slider
 const restartInterval = (func, delay) => {
@@ -60,37 +93,23 @@ let sliderEngine = () => {
 
 const restart = restartInterval(sliderEngine, 3000); // Запустить интервал с функцией sliderEngine и задержкой 3000 миллисекунд
 
-let options = {
-    clientId: 'mr_' + Math.random().toString(16).substring(2, 8),
-    username: mqtt.username,
-    password: mqtt.password,
-    useSSL: false,
-    protocolId: 'MQTT',
-    protocolVersion: 5,
-    rejectUnauthorized: false,
-    clean: true,
-    reconnectPeriod: 20000,
-    connectTimeout: 30 * 1000,
-    protocol: 'mqtt',
-};
+let formatMinutes = (minutes) => {
+    let number = minutes % 100;
+    let lastDigit = number % 10;
+  
+    if (number >= 11 && number <= 19) {
+      return minutes + ' минут';
+    } else if (lastDigit === 1) {
+      return minutes + ' минута';
+    } else if (lastDigit >= 2 && lastDigit <= 4) {
+      return minutes + ' минуты';
+    } else {
+      return minutes + ' минут';
+    }
+}
 
-mqttClient = mqtt.connect(host, options);
+const messageHandler = (topic, message) => {
 
-mqttClient.on("error", (err) => {
-    console.log("Error: ", err);
-    mqttClient.end();
-});
-
-mqttClient.on("reconnect", () => {
-    console.log("Reconnecting...");
-});
-
-mqttClient.on("connect", () => {
-    console.log("Client connected:" + options.clientId);
-});
-
-// Received Message
-mqttClient.on("message", (topic, message) => {
     topic = topic.split("/");
 
     topic[0] !== 'robot' && 'This is not robot';
@@ -131,27 +150,4 @@ mqttClient.on("message", (topic, message) => {
 
     // reset slider after new topic
     restart()
-});
-
-// Subscribe on topics
-mqttClient.subscribe('#', { qos: 0 });
-
-
-// DOM manipulation
-let listRobotsWrapper = document.querySelector(".wrapper");
-
-
-let formatMinutes = (minutes) => {
-    let number = minutes % 100;
-    let lastDigit = number % 10;
-  
-    if (number >= 11 && number <= 19) {
-      return minutes + ' минут';
-    } else if (lastDigit === 1) {
-      return minutes + ' минута';
-    } else if (lastDigit >= 2 && lastDigit <= 4) {
-      return minutes + ' минуты';
-    } else {
-      return minutes + ' минут';
-    }
 }

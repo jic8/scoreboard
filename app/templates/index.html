@@ -33,17 +33,19 @@
 	.hide{
 		display: none;
 	}
+	/* TODO: color status */
 	</style>
 </head>
     <body> 
-        <div class="wrapper" data-url="{{context.full_server_url}}">
+        <div class="wrapper">
 			{% for num_robot in range(1, context.count_robots + 1) %}
 				<div class="robot" data-robot="{{num_robot}}">
 					<span class="arrow">&#10550;</span><span class="robnum">{{num_robot}}</span><span class="state">Свободен</span><span class="time hide">---</span>
 				</div>
 			{% endfor %}
 		</div>
+		{{context.brokers}}
     	<script src="./static/js/mqtt.min.js"></script>
-    	<script src="./static/js/main.js"></script>
+    	<script src="./static/js/mainClass.js?{{context.brokers}}"></script>
     </body>
 </html>
