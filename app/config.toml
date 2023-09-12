@@ -12,5 +12,5 @@ mqtt_port = 9001
 [robots]
 count = 10
 direction = ["L","R","T","D","L","L","D","L","T","L"]
-slider_time = 10
+slider_time = 3
 
