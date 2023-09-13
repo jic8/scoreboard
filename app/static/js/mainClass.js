@@ -17,7 +17,7 @@ class MQTTClient {
         this.client = mqtt.connect(brokerUrl, options);
         
         this.client.on('connect', () => {
-            const textLog = `'MQTT клиент подключен ', ${brokerUrl}`;
+            const textLog = `MQTT клиент подключен, ${brokerUrl}`;
             const logData = {
                 level: 'info',
                 message:textLog,
@@ -40,7 +40,7 @@ class MQTTClient {
         });
         
         this.client.on("reconnect", () => {
-            const textLog = 'Reconnecting...';
+            const textLog = `Reconnecting to ${this.client.options.href} ...`;
             const logData = {
                 level: 'warning',
                 message: textLog,
