@@ -17,18 +17,63 @@ class MQTTClient {
         this.client = mqtt.connect(brokerUrl, options);
         
         this.client.on('connect', () => {
-        console.log('MQTT клиент подключен ', brokerUrl);
+            const textLog = `'MQTT клиент подключен ', ${brokerUrl}`;
+            const logData = {
+                level: 'info',
+                message:textLog,
+            };
+          
+          sendLogToBackend(logData);
+          console.log(textLog)
+        });
+
+        this.client.on("error", (err) => {
+            const textLog = `'Error: ', ${err}`;
+            const logData = {
+                level: 'error',
+                message:textLog,
+            };
+
+            sendLogToBackend(logData);
+            console.log(message)
+            this.client.end();
+        });
+        
+        this.client.on("reconnect", () => {
+            const textLog = 'Reconnecting...';
+            const logData = {
+                level: 'warning',
+                message: textLog,
+            };
+
+            sendLogToBackend(logData);
+            console.log(message)
         });
         
         this.client.on('message', (topic, message) => {
-        console.log(`Получено сообщение на топике ${topic}: ${message}`);
-        messageHandler(topic, message)
+            const textLog = `Получено сообщение на топике ${topic}: ${message}`;
+            const logData = {
+                level: 'info',
+                message: textLog,
+            };
+
+            sendLogToBackend(logData);
+            console.log(textLog)
+
+            messageHandler(topic, message)
         });
     }
 
     subscribe(topic) {
         this.client.subscribe(topic);
-        console.log(`Подписка на топик ${topic}`);
+        const textLog = `Подписка на топик ${topic}`;
+            const logData = {
+                level: 'info',
+                message:textLog,
+            };
+
+        sendLogToBackend(logData);
+        console.log(textLog)
     }
   }
 
@@ -187,3 +232,31 @@ const rotateArrow = (el, angle) => {
         }
     });
 })()
+
+
+// send logs on backend
+function sendLogToBackend(logData) {
+    const url = `/log`; // URL серверного эндпоинта для приема логов.
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(logData),
+    };
+  
+    fetch(url, options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Ошибка при отправке логов на бэкенд');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Логи успешно отправлены на бэкенд:', data.message);
+      })
+      .catch(error => {
+        console.error('Ошибка при отправке логов:', error);
+      });
+  }
+  

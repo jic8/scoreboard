@@ -1,6 +1,10 @@
 import toml
 from flask import Flask
 from flask import render_template
+from flask import request
+from flask import jsonify
+from logger import write_log
+
 app = Flask(__name__)
 
 # read config
@@ -26,6 +30,22 @@ context = {
 @app.route('/')
 def main():
     return render_template('index.html', context=context)
+
+
+# Создаем путь для приема логов с фронтенда
+@app.route('/log', methods=['POST'])
+def receive_logs():
+    if request.method == 'POST':
+        log_data = request.json  # Получаем данные лога из JSON-запроса
+
+        # Делаем что-то с данными лога (например, записываем в файл или базу данных)
+        # В этом примере мы просто выводим логи в консоль
+        write_log(log_data)
+
+        return jsonify({'message': 'Логи успешно приняты'}), 200
+    else:
+        return jsonify({'message': 'Метод не поддерживается'}), 405
+
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = 5000)
