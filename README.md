@@ -63,3 +63,8 @@
 > cd tableProject/app
 > flask run --host=0.0.0.0
 
+## Тестирование приложения
+
+Для отправки тестовых сообщений нужно, чтобы была установленна библиотека Mosquitto(https://mosquitto.org/)
+1) Для запуска брокера нужно ввести в консоль `mosquitto`
+2) Для отправки на брокер сообщение нужно ввести в консоль `mosquitto_pub -h localhost -t robot/3/state -m 2`

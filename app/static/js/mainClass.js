@@ -74,10 +74,10 @@ let sliderEngine = () => {
         let robotStatus = robot.querySelector(".state").innerHTML
         let robotTime = robot.querySelector(".time").innerHTML
         
-        // TODO: fix недоступно и в работе 
         if(robotStatus === 'Недоступен' || robotStatus === 'Свободен'){
             robot.querySelector('.time').classList.add('hide')
         }
+
         if(robotStatus === 'Занят' && robotTime !== '---'){
             let hideElement = robot.querySelector('.hide');
             let robotOption = hideElement.classList[0];
