@@ -47,7 +47,7 @@ class MQTTClient {
             };
 
             sendLogToBackend(logData);
-            console.log(message)
+            console.log(textLog)
         });
         
         this.client.on('message', (topic, message) => {
